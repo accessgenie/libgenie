@@ -1,0 +1,21 @@
+{
+  "name": "libgenie",
+  "version": "1.0.0",
+  "description": "accessgenie rules interpreter",
+  "private": true,
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "dependencies": {
+    "@types/lodash": "^4.17.5",
+    "boolean": "^3.2.0",
+    "lodash": "^4.17.21"
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/thenativeweb/boolean.git"
+  },
+  "license": "UNLICENSED"
+}
