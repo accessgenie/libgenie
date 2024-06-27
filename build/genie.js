@@ -44,8 +44,8 @@ function applyModifier(data, modifier) {
             case 'lowercase':
                 result = result.toLowerCase();
                 break;
-            case 'auto':
-                result = generate_password_1.default.generate(JSON.parse(item.arguments));
+            case 'password':
+                result = generate_password_1.default.generate(item.arguments);
                 break;
             case 'ascii':
                 result = (0, lodash_1.deburr)(result).replace(/[^\x00-\x7F]/g, '');
@@ -76,6 +76,7 @@ function applyMapping(data, mapping) {
     const blocks = mapping.block || [];
     for (const element of blocks) {
         let value = '';
+        const elementModifier = element.modifier || [];
         switch (element.type) {
             case 'field_reference':
                 value = (0, lodash_1.get)(data.payload, String(element.content));
@@ -83,6 +84,7 @@ function applyMapping(data, mapping) {
             default:
                 value = String(element.content);
         }
+        value = applyModifier(value, elementModifier);
         result.push(value);
     }
     const mapped = result.join('');

@@ -43,8 +43,8 @@ export function applyModifier(data: any, modifier: Modifier[]): any {
       case 'lowercase':
         result = result.toLowerCase();
         break;
-      case 'auto':
-        result = generator.generate(JSON.parse(item.arguments));
+      case 'password':
+        result = generator.generate(item.arguments);
         break;
       case 'ascii':
         result = deburr(result).replace(/[^\x00-\x7F]/g, '');
@@ -85,6 +85,7 @@ export function applyMapping(data: any, mapping: Mapping): any {
   const blocks = mapping.block || [];
   for (const element of blocks) {
     let value = '';
+    const elementModifier = element.modifier || [];
     switch (element.type) {
       case 'field_reference':
         value = get(data.payload, String(element.content));
@@ -92,6 +93,7 @@ export function applyMapping(data: any, mapping: Mapping): any {
       default:
         value = String(element.content);
     }
+    value = applyModifier(value, elementModifier);
     result.push(value);
   }
   const mapped = result.join('');
