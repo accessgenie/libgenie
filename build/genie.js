@@ -14,8 +14,8 @@ function applyProfile(data, mappings) {
         const modifier = mapping.modifier || [];
         const modified = applyModifier(mapped, modifier);
         const casted = applyCast(modified, mapping.dataType);
-        const field = mapping.field || '';
-        payload = { ...payload, [field]: casted };
+        const field = mapping.field;
+        payload = (0, lodash_1.set)(payload, field, casted);
     }
     data.payload = payload;
     return data;

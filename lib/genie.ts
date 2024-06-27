@@ -1,5 +1,5 @@
 import { boolean } from 'boolean';
-import { deburr, get } from 'lodash';
+import { deburr, get, set } from 'lodash';
 
 export type Mapping = {
   id: number;
@@ -55,8 +55,8 @@ export function applyProfile(data: any, mappings: Mapping[]): any {
     const modifier = mapping.modifier || [];
     const modified = applyModifier(mapped, modifier);
     const casted = applyCast(modified, mapping.dataType);
-    const field = mapping.field || '';
-    payload = { ...payload, [field]: casted };
+    const field = mapping.field;
+    payload = set(payload, field, casted);
   }
   data.payload = payload;
   return data;

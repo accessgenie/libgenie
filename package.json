@@ -8,7 +8,8 @@
   "dependencies": {
     "@types/lodash": "^4.17.5",
     "boolean": "^3.2.0",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "typescript": "^5.5.2"
   },
   "scripts": {
     "build": "tsc"
