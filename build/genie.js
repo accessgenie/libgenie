@@ -17,7 +17,9 @@ function applyProfile(data, mappings) {
         const mapped = applyMapping(data, mapping);
         const modifier = mapping.modifier || [];
         const modified = applyModifier(mapped, modifier);
-        const parsed = modifier.findIndex(m => m.name === 'password') === -1 ? modified : autoParseValue(modified);
+        const hasBlockModifierPassword = mapping.block && mapping.block.findIndex(b => b.modifier && b.modifier.findIndex(m => m.name === 'password') > -1) > -1;
+        const hasMappingModifierPassword = modifier.findIndex(m => m.name === 'password') > -1;
+        const parsed = hasBlockModifierPassword || hasMappingModifierPassword ? modified : autoParseValue(modified);
         const field = mapping.field;
         payload = (0, lodash_1.set)(payload, field, parsed);
     }
@@ -45,7 +47,7 @@ function applyModifier(data, modifier) {
                 result = result.toLowerCase();
                 break;
             case 'password':
-                result = generate_password_1.default.generate(item.arguments);
+                result = `5${generate_password_1.default.generate(item.arguments)}`;
                 break;
             case 'ascii':
                 result = (0, lodash_1.deburr)(result).replace(/[^\x00-\x7F]/g, '');
