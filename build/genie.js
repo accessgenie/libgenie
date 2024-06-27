@@ -45,7 +45,14 @@ function applyModifier(data, modifier) {
                 result = result.toLowerCase();
                 break;
             case 'password':
-                result = generate_password_1.default.generate(item.arguments);
+                const pwdArguments = item.arguments;
+                if (!pwdArguments.exclude) {
+                    pwdArguments.exclude = '';
+                }
+                if (!pwdArguments.exclude.includes('|')) {
+                    pwdArguments.exclude += '|';
+                }
+                result = generate_password_1.default.generate(pwdArguments);
                 break;
             case 'ascii':
                 result = (0, lodash_1.deburr)(result).replace(/[^\x00-\x7F]/g, '');

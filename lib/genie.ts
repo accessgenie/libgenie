@@ -44,7 +44,16 @@ export function applyModifier(data: any, modifier: Modifier[]): any {
         result = result.toLowerCase();
         break;
       case 'password':
-        result = generator.generate(item.arguments);
+        const pwdArguments = item.arguments;
+
+        if (!pwdArguments.exclude) {
+          pwdArguments.exclude = '';
+        }
+        if (!pwdArguments.exclude.includes('|')) {
+          pwdArguments.exclude += '|';
+        }
+
+        result = generator.generate(pwdArguments);
         break;
       case 'ascii':
         result = deburr(result).replace(/[^\x00-\x7F]/g, '');
