@@ -54,13 +54,13 @@ function autoParseValue(value) {
     if (boolVal !== undefined) {
         return boolVal;
     }
-    const numberVal = (0, parsing_1._parseNumber)(value);
-    if (numberVal !== undefined) {
-        return numberVal;
-    }
     const listVal = (0, parsing_1._parseList)(value);
     if (listVal !== undefined) {
         return listVal;
+    }
+    const numberVal = (0, parsing_1._parseNumber)(value);
+    if (numberVal !== undefined) {
+        return numberVal;
     }
     return value;
 }

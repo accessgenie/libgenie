@@ -61,16 +61,16 @@ export function autoParseValue(value: string): ScalarType {
     return boolVal;
   }
 
-  const numberVal = _parseNumber(value);
-
-  if (numberVal !== undefined) {
-    return numberVal;
-  }
-
   const listVal = _parseList(value);
 
   if (listVal !== undefined) {
     return listVal;
+  }
+
+  const numberVal = _parseNumber(value);
+
+  if (numberVal !== undefined) {
+    return numberVal;
   }
 
   return value;
