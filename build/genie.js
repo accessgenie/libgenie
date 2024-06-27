@@ -65,6 +65,10 @@ function autoParseValue(value) {
     if (listVal !== undefined) {
         return listVal;
     }
+    const date = new Date(value);
+    if (!isNaN(date.getTime())) {
+        return value;
+    }
     const numberVal = (0, parsing_1._parseNumber)(value);
     if (numberVal !== undefined) {
         return numberVal;

@@ -71,6 +71,11 @@ export function autoParseValue(value: string): ScalarType {
     return listVal;
   }
 
+  const date = new Date(value);
+  if (!isNaN(date.getTime())) {
+    return value;
+  }
+
   const numberVal = _parseNumber(value);
 
   if (numberVal !== undefined) {
