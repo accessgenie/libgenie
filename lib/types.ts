@@ -29,4 +29,4 @@ export type Modifier = {
   arguments?: any;
 };
 
-export type ScalarType = (boolean | number | string);
+export type ScalarType = (null | boolean | number | string);

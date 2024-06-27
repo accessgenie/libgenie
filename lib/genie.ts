@@ -45,6 +45,10 @@ export function applyModifier(data: any, modifier: Modifier[]): any {
 }
 
 export function applyCast(data: any, dataType: string): ScalarType {
+  if (data && data.toLowerCase() === "null") {
+    return null;
+  }
+
   switch (dataType) {
     case 'string':
       return String(data);
@@ -61,6 +65,10 @@ export function applyCast(data: any, dataType: string): ScalarType {
 }
 
 function autoParseValue(value: string): ScalarType {
+  if (value && value.toLowerCase() === "null") {
+    return null;
+  }
+
   function parseBool(): boolean {
     const valueLower = value.toLowerCase();
 
