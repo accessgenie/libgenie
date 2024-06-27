@@ -1,4 +1,7 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.applyProfile = applyProfile;
 exports.applyModifier = applyModifier;
@@ -6,6 +9,7 @@ exports.autoParseValue = autoParseValue;
 exports.applyMapping = applyMapping;
 exports.matchesExpression = matchesExpression;
 const lodash_1 = require("lodash");
+const generate_password_1 = __importDefault(require("generate-password"));
 const parsing_1 = require("./parsing");
 function applyProfile(data, mappings) {
     let payload = {};
@@ -39,6 +43,9 @@ function applyModifier(data, modifier) {
                 break;
             case 'lowercase':
                 result = result.toLowerCase();
+                break;
+            case 'auto':
+                result = generate_password_1.default.generate(item.arguments);
                 break;
             case 'ascii':
                 result = (0, lodash_1.deburr)(result).replace(/[^\x00-\x7F]/g, '');

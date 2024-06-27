@@ -1,4 +1,5 @@
 import { deburr, get, set } from 'lodash';
+import generator from 'generate-password';
 import { _parseBool, _parseList, _parseNumber } from './parsing';
 import type { Expression, Mapping, Modifier, ScalarType } from './types';
 
@@ -41,6 +42,9 @@ export function applyModifier(data: any, modifier: Modifier[]): any {
         break;
       case 'lowercase':
         result = result.toLowerCase();
+        break;
+      case 'auto':
+        result = generator.generate(item.arguments);
         break;
       case 'ascii':
         result = deburr(result).replace(/[^\x00-\x7F]/g, '');
