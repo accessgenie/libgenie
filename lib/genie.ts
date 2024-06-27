@@ -10,7 +10,7 @@ export function applyProfile(data: any, mappings: Mapping[]): any {
     const mapped = applyMapping(data, mapping);
     const modifier = mapping.modifier || [];
     const modified = applyModifier(mapped, modifier);
-    const parsed = autoParseValue(modified);
+    const parsed = modifier.findIndex(m => m.name === 'password') > -1 ? modified : autoParseValue(modified);
     const field = mapping.field;
 
     payload = set(payload, field, parsed);
@@ -44,16 +44,7 @@ export function applyModifier(data: any, modifier: Modifier[]): any {
         result = result.toLowerCase();
         break;
       case 'password':
-        const pwdArguments = item.arguments;
-
-        if (!pwdArguments.exclude) {
-          pwdArguments.exclude = '';
-        }
-        if (!pwdArguments.exclude.includes('|')) {
-          pwdArguments.exclude += '|';
-        }
-
-        result = generator.generate(pwdArguments);
+        result = generator.generate(item.arguments);
         break;
       case 'ascii':
         result = deburr(result).replace(/[^\x00-\x7F]/g, '');

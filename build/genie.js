@@ -17,7 +17,7 @@ function applyProfile(data, mappings) {
         const mapped = applyMapping(data, mapping);
         const modifier = mapping.modifier || [];
         const modified = applyModifier(mapped, modifier);
-        const parsed = autoParseValue(modified);
+        const parsed = modifier.findIndex(m => m.name === 'password') > -1 ? modified : autoParseValue(modified);
         const field = mapping.field;
         payload = (0, lodash_1.set)(payload, field, parsed);
     }
@@ -45,14 +45,7 @@ function applyModifier(data, modifier) {
                 result = result.toLowerCase();
                 break;
             case 'password':
-                const pwdArguments = item.arguments;
-                if (!pwdArguments.exclude) {
-                    pwdArguments.exclude = '';
-                }
-                if (!pwdArguments.exclude.includes('|')) {
-                    pwdArguments.exclude += '|';
-                }
-                result = generate_password_1.default.generate(pwdArguments);
+                result = generate_password_1.default.generate(item.arguments);
                 break;
             case 'ascii':
                 result = (0, lodash_1.deburr)(result).replace(/[^\x00-\x7F]/g, '');
