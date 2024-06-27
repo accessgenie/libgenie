@@ -49,7 +49,7 @@ export function applyModifier(data: any, modifier: Modifier[]): any {
   return result;
 }
 
-function autoParseValue(value: string): ScalarType {
+export function autoParseValue(value: string): ScalarType {
   if (value && value.toLowerCase() === 'null') {
     return null;
   }
