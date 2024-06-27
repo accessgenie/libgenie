@@ -17,7 +17,7 @@ function applyProfile(data, mappings) {
         const mapped = applyMapping(data, mapping);
         const modifier = mapping.modifier || [];
         const modified = applyModifier(mapped, modifier);
-        const parsed = modifier.findIndex(m => m.name === 'password') > -1 ? modified : autoParseValue(modified);
+        const parsed = modifier.findIndex(m => m.name === 'password') === -1 ? modified : autoParseValue(modified);
         const field = mapping.field;
         payload = (0, lodash_1.set)(payload, field, parsed);
     }
