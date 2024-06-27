@@ -44,7 +44,7 @@ export function applyModifier(data: any, modifier: Modifier[]): any {
         result = result.toLowerCase();
         break;
       case 'auto':
-        result = generator.generate(item.arguments);
+        result = generator.generate(JSON.parse(item.arguments));
         break;
       case 'ascii':
         result = deburr(result).replace(/[^\x00-\x7F]/g, '');

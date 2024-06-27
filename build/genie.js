@@ -45,7 +45,7 @@ function applyModifier(data, modifier) {
                 result = result.toLowerCase();
                 break;
             case 'auto':
-                result = generate_password_1.default.generate(item.arguments);
+                result = generate_password_1.default.generate(JSON.parse(item.arguments));
                 break;
             case 'ascii':
                 result = (0, lodash_1.deburr)(result).replace(/[^\x00-\x7F]/g, '');
