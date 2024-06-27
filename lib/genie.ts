@@ -1,19 +1,21 @@
-import { boolean } from 'boolean';
 import { deburr, get, set } from 'lodash';
 import type { Expression, Mapping, Modifier, ScalarType } from './types';
 
 export function applyProfile(data: any, mappings: Mapping[]): any {
   let payload = {};
+
   for (const mapping of mappings) {
     const mapped = applyMapping(data, mapping);
-
     const modifier = mapping.modifier || [];
     const modified = applyModifier(mapped, modifier);
-    const casted = mapping.dataType ? applyCast(modified, mapping.dataType) : autoParseValue(modified);
+    const parsed = autoParseValue(modified);
     const field = mapping.field;
-    payload = set(payload, field, casted);
+
+    payload = set(payload, field, parsed);
   }
+
   data.payload = payload;
+
   return data;
 }
 
@@ -21,7 +23,9 @@ export function applyModifier(data: any, modifier: Modifier[]): any {
   if (!modifier) {
     return data;
   }
+
   let result = String(data);
+
   for (const item of modifier) {
     switch (item.name) {
       case 'trim':
@@ -41,43 +45,24 @@ export function applyModifier(data: any, modifier: Modifier[]): any {
         result = deburr(result).replace(/[^\x00-\x7F]/g, '');
     }
   }
+
   return result;
 }
 
-export function applyCast(data: any, dataType: string): ScalarType {
-  if (data && data.toLowerCase() === "null") {
-    return null;
-  }
-
-  switch (dataType) {
-    case 'string':
-      return String(data);
-    case 'number':
-      return Number(data);
-    case 'boolean':
-      return boolean(data);
-    case 'liststring':
-      return data.split('|');
-    case 'listnumber':
-      return data.split('|').map(Number);
-  }
-  return data;
-}
-
 function autoParseValue(value: string): ScalarType {
-  if (value && value.toLowerCase() === "null") {
+  if (value && value.toLowerCase() === 'null') {
     return null;
   }
 
   function parseBool(): boolean {
     const valueLower = value.toLowerCase();
 
-    if (valueLower === "true") {
+    if (valueLower === 'true') {
       return true;
-    } else if (valueLower === "false") {
+    } else if (valueLower === 'false') {
       return false;
     } else {
-      throw new Error("Invalid boolean value");
+      throw new Error('Invalid boolean value');
     }
   }
 
@@ -96,9 +81,26 @@ function autoParseValue(value: string): ScalarType {
   } catch (e) {
   }
 
+  // parse lists, in case value contains | as a part of its contents maybe || could be used?
+  // or we could use a bool property passed here alongside value - isList
+  if (value.includes('|')) {
+    const parts = value.split('|')
+    const parsed = [];
+
+    for (const part of parts) {
+      try {
+        parsed.push(Number(part));
+      }
+      catch {
+        parsed.push(part);
+      }
+    }
+
+    return parsed;
+  }
+
   return value;
 }
-
 
 export function applyMapping(data: any, mapping: Mapping): any {
   const result = [];
@@ -120,26 +122,17 @@ export function applyMapping(data: any, mapping: Mapping): any {
 }
 
 export function matchesExpression(data: any, expression: Expression): boolean {
-  let inputValue: any = get(data.payload, expression.field);
+  let inputValue = get(data.payload, expression.field);
   let expressionValue: any = expression.value;
-  switch (expression.dataType) {
-    case 'string':
-      inputValue = applyCast(inputValue, 'string');
-      expressionValue = applyCast(expressionValue, 'string');
-      break;
-    case 'number':
-      inputValue = applyCast(inputValue, 'number');
-      expressionValue = applyCast(expressionValue, 'number');
-      break;
-    case 'boolean':
-      inputValue = applyCast(inputValue, 'boolean');
-      expressionValue = applyCast(expressionValue, 'boolean');
-      break;
-    case 'date':
-      inputValue = new Date(inputValue).getTime();
-      expressionValue = new Date(expressionValue).getTime();
-      break;
+
+  if (isValidDateString(inputValue) && isValidDateString(expressionValue)) {
+    inputValue = new Date(inputValue);
+    expressionValue = new Date(expressionValue);
+  } else {
+    inputValue = autoParseValue(inputValue);
+    expressionValue = autoParseValue(expressionValue);
   }
+
   switch (expression.comparison) {
     case 'equals':
       return inputValue === expressionValue;
@@ -156,5 +149,17 @@ export function matchesExpression(data: any, expression: Expression): boolean {
     case 'regex':
       return new RegExp(expressionValue).test(inputValue);
   }
+
   return false;
+}
+
+function isValidDateString(dateString: string): boolean {
+  try {
+    const date = new Date(dateString);
+
+    return !isNaN(date.getTime());
+  }
+  catch {
+    return false;
+  }
 }
