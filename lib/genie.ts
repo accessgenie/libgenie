@@ -1,4 +1,5 @@
 import { deburr, get, set } from 'lodash';
+import { _parseBool, _parseList, _parseNumber } from './parsing';
 import type { Expression, Mapping, Modifier, ScalarType } from './types';
 
 export function applyProfile(data: any, mappings: Mapping[]): any {
@@ -54,49 +55,22 @@ export function autoParseValue(value: string): ScalarType {
     return null;
   }
 
-  function parseBool(): boolean {
-    const valueLower = value.toLowerCase();
+  const boolVal = _parseBool(value);
 
-    if (valueLower === 'true') {
-      return true;
-    } else if (valueLower === 'false') {
-      return false;
-    } else {
-      throw new Error('Invalid boolean value');
-    }
+  if (boolVal !== undefined) {
+    return boolVal;
   }
 
-  try {
-    return parseBool();
-  } catch (e) {
+  const numberVal = _parseNumber(value);
+
+  if (numberVal !== undefined) {
+    return numberVal;
   }
 
-  try {
-    return parseInt(value, 10);
-  } catch (e) {
-  }
+  const listVal = _parseList(value);
 
-  try {
-    return parseFloat(value);
-  } catch (e) {
-  }
-
-  // parse lists, in case value contains | as a part of its contents maybe || could be used?
-  // or we could use a bool property passed here alongside value - isList
-  if (value.includes('|')) {
-    const parts = value.split('|')
-    const parsed = [];
-
-    for (const part of parts) {
-      try {
-        parsed.push(Number(part));
-      }
-      catch {
-        parsed.push(part);
-      }
-    }
-
-    return parsed;
+  if (listVal !== undefined) {
+    return listVal;
   }
 
   return value;

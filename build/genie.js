@@ -6,6 +6,7 @@ exports.autoParseValue = autoParseValue;
 exports.applyMapping = applyMapping;
 exports.matchesExpression = matchesExpression;
 const lodash_1 = require("lodash");
+const parsing_1 = require("./parsing");
 function applyProfile(data, mappings) {
     let payload = {};
     for (const mapping of mappings) {
@@ -49,47 +50,17 @@ function autoParseValue(value) {
     if (value && value.toLowerCase() === 'null') {
         return null;
     }
-    function parseBool() {
-        const valueLower = value.toLowerCase();
-        if (valueLower === 'true') {
-            return true;
-        }
-        else if (valueLower === 'false') {
-            return false;
-        }
-        else {
-            throw new Error('Invalid boolean value');
-        }
+    const boolVal = (0, parsing_1._parseBool)(value);
+    if (boolVal !== undefined) {
+        return boolVal;
     }
-    try {
-        return parseBool();
+    const numberVal = (0, parsing_1._parseNumber)(value);
+    if (numberVal !== undefined) {
+        return numberVal;
     }
-    catch (e) {
-    }
-    try {
-        return parseInt(value, 10);
-    }
-    catch (e) {
-    }
-    try {
-        return parseFloat(value);
-    }
-    catch (e) {
-    }
-    // parse lists, in case value contains | as a part of its contents maybe || could be used?
-    // or we could use a bool property passed here alongside value - isList
-    if (value.includes('|')) {
-        const parts = value.split('|');
-        const parsed = [];
-        for (const part of parts) {
-            try {
-                parsed.push(Number(part));
-            }
-            catch {
-                parsed.push(part);
-            }
-        }
-        return parsed;
+    const listVal = (0, parsing_1._parseList)(value);
+    if (listVal !== undefined) {
+        return listVal;
     }
     return value;
 }
