@@ -1,51 +1,6 @@
 import { boolean } from 'boolean';
 import { deburr, get, set } from 'lodash';
-
-export type Mapping = {
-  id: number;
-
-  name: string;
-
-  field: string;
-
-  dataType: string;
-
-  block?: Block[];
-
-  modifier?: Modifier[];
-};
-
-export type Block = {
-  id: number;
-
-  type: string;
-
-  content?: string;
-
-  modifier?: Modifier[];
-};
-
-export type Expression = {
-  id: number;
-
-  field: string;
-
-  comparison: string;
-
-  value: string;
-
-  name: string;
-
-  dataType: string;
-};
-
-export type Modifier = {
-  id: number;
-
-  name: string;
-
-  arguments?: any;
-};
+import type { Expression, Mapping, Modifier, ScalarType } from './types';
 
 export function applyProfile(data: any, mappings: Mapping[]): any {
   let payload = {};
@@ -54,7 +9,7 @@ export function applyProfile(data: any, mappings: Mapping[]): any {
 
     const modifier = mapping.modifier || [];
     const modified = applyModifier(mapped, modifier);
-    const casted = applyCast(modified, mapping.dataType);
+    const casted = mapping.dataType ? applyCast(modified, mapping.dataType) : autoParseValue(modified);
     const field = mapping.field;
     payload = set(payload, field, casted);
   }
@@ -89,7 +44,7 @@ export function applyModifier(data: any, modifier: Modifier[]): any {
   return result;
 }
 
-export function applyCast(data: any, dataType: string): any {
+export function applyCast(data: any, dataType: string): ScalarType {
   switch (dataType) {
     case 'string':
       return String(data);
@@ -104,6 +59,38 @@ export function applyCast(data: any, dataType: string): any {
   }
   return data;
 }
+
+function autoParseValue(value: string): ScalarType {
+  function parseBool(): boolean {
+    const valueLower = value.toLowerCase();
+
+    if (valueLower === "true") {
+      return true;
+    } else if (valueLower === "false") {
+      return false;
+    } else {
+      throw new Error("Invalid boolean value");
+    }
+  }
+
+  try {
+    return parseBool();
+  } catch (e) {
+  }
+
+  try {
+    return parseInt(value, 10);
+  } catch (e) {
+  }
+
+  try {
+    return parseFloat(value);
+  } catch (e) {
+  }
+
+  return value;
+}
+
 
 export function applyMapping(data: any, mapping: Mapping): any {
   const result = [];
