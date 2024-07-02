@@ -8,6 +8,7 @@ exports.applyModifier = applyModifier;
 exports.autoParseValue = autoParseValue;
 exports.applyMapping = applyMapping;
 exports.matchesExpression = matchesExpression;
+exports.orderedGet = orderedGet;
 const lodash_1 = require("lodash");
 const generate_password_1 = __importDefault(require("generate-password"));
 const parsing_1 = require("./parsing");
@@ -125,6 +126,43 @@ function matchesExpression(data, expression) {
             return new RegExp(expressionValue).test(inputValue);
     }
     return false;
+}
+// this is supposed to check for a field in the format of "employmentStatus.NUMBER.startDate"
+// it will then sort the array of employmentStatus objects by the startDate field
+function orderedGet(data, path, sort = 'asc') {
+    const sortDirection = sort === 'asc' ? 1 : -1;
+    const parts = path.split('.');
+    if (parts.length === 1) {
+        return (0, lodash_1.get)(data, path);
+    }
+    const actualKey = String(parts.pop());
+    const containerIndex = String(parts.pop());
+    if (!containerIndex.match(/\d+/)) {
+        return (0, lodash_1.get)(data, path);
+    }
+    let container = (0, lodash_1.get)(data, parts);
+    if ((0, lodash_1.isArray)(container)) {
+        container.sort((a, b) => {
+            let first = a[actualKey];
+            let last = b[actualKey];
+            if (isValidDateString(first)) {
+                first = new Date(first);
+                last = new Date(last);
+            }
+            else {
+                first = autoParseValue(first);
+                last = autoParseValue(last);
+            }
+            if (first > last) {
+                return 1 * sortDirection;
+            }
+            if (first < last) {
+                return -1 * sortDirection;
+            }
+            return 0;
+        });
+    }
+    return (0, lodash_1.get)(container, [containerIndex, actualKey]);
 }
 function isValidDateString(dateString) {
     try {

@@ -1,4 +1,4 @@
-import { deburr, get, set } from 'lodash';
+import { deburr, get, isArray, set, sortBy } from 'lodash';
 import generator from 'generate-password';
 import { _parseBool, _parseList, _parseNumber } from './parsing';
 import type { Expression, Mapping, Modifier, ScalarType } from './types';
@@ -95,7 +95,8 @@ export function applyMapping(data: any, mapping: Mapping): any {
     const elementModifier = element.modifier || [];
     switch (element.type) {
       case 'field_reference':
-        value = get(data.payload, String(element.content));
+        const sort = element.sort;
+        value = orderedGet(data.payload, String(element.content), sort);
         break;
       default:
         value = String(element.content);
@@ -109,7 +110,8 @@ export function applyMapping(data: any, mapping: Mapping): any {
 }
 
 export function matchesExpression(data: any, expression: Expression): boolean {
-  let inputValue = get(data.payload, expression.field);
+  const sort = data.sort;
+  let inputValue = orderedGet(data.payload, expression.field, sort);
   let expressionValue: any = expression.value;
 
   if (isValidDateString(inputValue) && isValidDateString(expressionValue)) {
@@ -138,6 +140,50 @@ export function matchesExpression(data: any, expression: Expression): boolean {
   }
 
   return false;
+}
+
+// this is supposed to check for a field in the format of "employmentStatus.NUMBER.startDate"
+// it will then sort the array of employmentStatus objects by the startDate field
+export function orderedGet(data: any, path: string, sort: string | null): any {
+  if (sort === undefined || !sort) {
+    return get(data, path);
+  }
+  const sortDirection = sort === 'ascending' ? 1 : -1;
+  const parts = path.split('.');
+  if (parts.length === 1) {
+    return get(data, path);
+  }
+  const actualKey = String(parts.pop());
+  const containerIndex = String(parts.pop());
+  if (!containerIndex.match(/\d+/)) {
+    return get(data, path);
+  }
+
+  let container = get(data, parts);
+  if (isArray(container)) {
+    container.sort((a, b) => {
+      let first = a[actualKey];
+      let last = b[actualKey];
+      if (isValidDateString(first)) {
+        first = new Date(first);
+        last = new Date(last);
+      } else {
+        first = autoParseValue(first);
+        last = autoParseValue(last);
+      }
+
+      if (first > last) {
+        return 1 * sortDirection;
+      }
+      if (first < last) {
+        return -1 * sortDirection;
+      }
+      return 0;
+    });
+  }
+
+  return get(container, [containerIndex, actualKey]);
+
 }
 
 function isValidDateString(dateString: string): boolean {
