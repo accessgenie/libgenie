@@ -2,7 +2,6 @@ export type Mapping = {
   id: number;
   name: string;
   field: string;
-  sort: string | null;
   block?: Block[];
   modifier?: Modifier[];
 };

@@ -39,13 +39,13 @@ export function _parseFloat(val: string): number | undefined {
 export function _parseNumber(val: string): number | undefined {
   const intVal = _parseInt(val);
 
-  if (intVal !== undefined) {
+  if (intVal !== undefined && String(intVal) === String(val)) {
     return intVal;
   }
 
   const floatVal = _parseFloat(val);
 
-  if (floatVal !== undefined) {
+  if (floatVal !== undefined && String(floatVal) === String(val)) {
     return floatVal;
   }
 
