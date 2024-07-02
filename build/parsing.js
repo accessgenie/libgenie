@@ -37,11 +37,11 @@ function _parseFloat(val) {
 }
 function _parseNumber(val) {
     const intVal = _parseInt(val);
-    if (intVal !== undefined) {
+    if (intVal !== undefined && String(intVal) === String(val)) {
         return intVal;
     }
     const floatVal = _parseFloat(val);
-    if (floatVal !== undefined) {
+    if (floatVal !== undefined && String(floatVal) === String(val)) {
         return floatVal;
     }
     return undefined;

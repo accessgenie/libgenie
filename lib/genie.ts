@@ -95,7 +95,7 @@ export function applyMapping(data: any, mapping: Mapping): any {
     switch (element.type) {
       case 'field_reference':
         const sort = element.sort || null;
-        value = orderedGet(data, String(element.content), sort);
+        value = orderedGet(data.payload, String(element.content), sort);
         break;
       default:
         value = String(element.content);

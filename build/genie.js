@@ -28,7 +28,7 @@ function applyProfile(data, mappings) {
     return data;
 }
 function applyModifier(data, modifier) {
-    if (!modifier) {
+    if (!modifier.length) {
         return data;
     }
     let result = String(data);
@@ -68,13 +68,12 @@ function autoParseValue(value) {
     if (listVal !== undefined) {
         return listVal;
     }
-    const date = new Date(value);
-    if (!isNaN(date.getTime())) {
-        return value;
-    }
     const numberVal = (0, parsing_1._parseNumber)(value);
     if (numberVal !== undefined) {
         return numberVal;
+    }
+    if (isValidDateString(value)) {
+        return value;
     }
     return value;
 }
@@ -86,7 +85,8 @@ function applyMapping(data, mapping) {
         const elementModifier = element.modifier || [];
         switch (element.type) {
             case 'field_reference':
-                value = (0, lodash_1.get)(data.payload, String(element.content));
+                const sort = element.sort || null;
+                value = orderedGet(data.payload, String(element.content), sort);
                 break;
             default:
                 value = String(element.content);
@@ -99,7 +99,8 @@ function applyMapping(data, mapping) {
     return applyModifier(mapped, modifier);
 }
 function matchesExpression(data, expression) {
-    let inputValue = (0, lodash_1.get)(data.payload, expression.field);
+    const sort = expression.sort;
+    let inputValue = orderedGet(data.payload, expression.field, sort);
     let expressionValue = expression.value;
     if (isValidDateString(inputValue) && isValidDateString(expressionValue)) {
         inputValue = new Date(inputValue);
@@ -129,8 +130,11 @@ function matchesExpression(data, expression) {
 }
 // this is supposed to check for a field in the format of "employmentStatus.NUMBER.startDate"
 // it will then sort the array of employmentStatus objects by the startDate field
-function orderedGet(data, path, sort = 'asc') {
-    const sortDirection = sort === 'asc' ? 1 : -1;
+function orderedGet(data, path, sort) {
+    if (sort === undefined || !sort) {
+        return (0, lodash_1.get)(data, path);
+    }
+    const sortDirection = sort === 'ascending' ? 1 : -1;
     const parts = path.split('.');
     if (parts.length === 1) {
         return (0, lodash_1.get)(data, path);
@@ -143,15 +147,10 @@ function orderedGet(data, path, sort = 'asc') {
     let container = (0, lodash_1.get)(data, parts);
     if ((0, lodash_1.isArray)(container)) {
         container.sort((a, b) => {
-            let first = a[actualKey];
-            let last = b[actualKey];
-            if (isValidDateString(first)) {
-                first = new Date(first);
-                last = new Date(last);
-            }
-            else {
-                first = autoParseValue(first);
-                last = autoParseValue(last);
+            let first = autoParseValue(a[actualKey]);
+            let last = autoParseValue(b[actualKey]);
+            if (first === null || last === null) {
+                return 0;
             }
             if (first > last) {
                 return 1 * sortDirection;
