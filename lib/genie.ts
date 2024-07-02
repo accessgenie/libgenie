@@ -24,7 +24,7 @@ export function applyProfile(data: any, mappings: Mapping[]): any {
 }
 
 export function applyModifier(data: any, modifier: Modifier[]): any {
-  if (!modifier) {
+  if (!modifier.length) {
     return data;
   }
 
@@ -73,15 +73,14 @@ export function autoParseValue(value: string): ScalarType {
     return listVal;
   }
 
-  const date = new Date(value);
-  if (!isNaN(date.getTime())) {
-    return value;
-  }
-
   const numberVal = _parseNumber(value);
 
   if (numberVal !== undefined) {
     return numberVal;
+  }
+
+  if (isValidDateString(value)) {
+    return value;
   }
 
   return value;
@@ -95,8 +94,8 @@ export function applyMapping(data: any, mapping: Mapping): any {
     const elementModifier = element.modifier || [];
     switch (element.type) {
       case 'field_reference':
-        const sort = element.sort;
-        value = orderedGet(data.payload, String(element.content), sort);
+        const sort = element.sort || null;
+        value = orderedGet(data, String(element.content), sort);
         break;
       default:
         value = String(element.content);
@@ -110,7 +109,7 @@ export function applyMapping(data: any, mapping: Mapping): any {
 }
 
 export function matchesExpression(data: any, expression: Expression): boolean {
-  const sort = data.sort;
+  const sort = expression.sort;
   let inputValue = orderedGet(data.payload, expression.field, sort);
   let expressionValue: any = expression.value;
 
@@ -162,14 +161,10 @@ export function orderedGet(data: any, path: string, sort: string | null): any {
   let container = get(data, parts);
   if (isArray(container)) {
     container.sort((a, b) => {
-      let first = a[actualKey];
-      let last = b[actualKey];
-      if (isValidDateString(first)) {
-        first = new Date(first);
-        last = new Date(last);
-      } else {
-        first = autoParseValue(first);
-        last = autoParseValue(last);
+      let first = autoParseValue(a[actualKey]);
+      let last = autoParseValue(b[actualKey]);
+      if (first === null || last === null) {
+        return 0;
       }
 
       if (first > last) {
