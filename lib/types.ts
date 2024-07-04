@@ -30,3 +30,13 @@ export type Modifier = {
 };
 
 export type ScalarType = (null | boolean | number | string | (string | number)[]);
+
+export enum ResourceType {
+  Facilities = 'facilities',
+  Roles = 'roles',
+}
+
+export type LookupRow = {
+  key: string;
+  value: string;
+};
