@@ -8,6 +8,7 @@ exports.applyModifier = applyModifier;
 exports.autoParseValue = autoParseValue;
 exports.applyMapping = applyMapping;
 exports.matchesExpression = matchesExpression;
+exports.orderedGet = orderedGet;
 const lodash_1 = require("lodash");
 const generate_password_1 = __importDefault(require("generate-password"));
 const parsing_1 = require("./parsing");
@@ -17,7 +18,9 @@ function applyProfile(data, mappings) {
         const mapped = applyMapping(data, mapping);
         const modifier = mapping.modifier || [];
         const modified = applyModifier(mapped, modifier);
-        const parsed = modifier.findIndex(m => m.name === 'password') > -1 ? modified : autoParseValue(modified);
+        const hasBlockModifierPassword = mapping.block && mapping.block.findIndex(b => b.modifier && b.modifier.findIndex(m => m.name === 'password') > -1) > -1;
+        const hasMappingModifierPassword = modifier.findIndex(m => m.name === 'password') > -1;
+        const parsed = hasBlockModifierPassword || hasMappingModifierPassword ? modified : autoParseValue(modified);
         const field = mapping.field;
         payload = (0, lodash_1.set)(payload, field, parsed);
     }
@@ -25,7 +28,7 @@ function applyProfile(data, mappings) {
     return data;
 }
 function applyModifier(data, modifier) {
-    if (!modifier) {
+    if (!modifier.length) {
         return data;
     }
     let result = String(data);
@@ -45,7 +48,7 @@ function applyModifier(data, modifier) {
                 result = result.toLowerCase();
                 break;
             case 'password':
-                result = generate_password_1.default.generate(item.arguments);
+                result = `5${generate_password_1.default.generate(item.arguments)}`;
                 break;
             case 'ascii':
                 result = (0, lodash_1.deburr)(result).replace(/[^\x00-\x7F]/g, '');
@@ -69,6 +72,9 @@ function autoParseValue(value) {
     if (numberVal !== undefined) {
         return numberVal;
     }
+    if (isValidDateString(value)) {
+        return value;
+    }
     return value;
 }
 function applyMapping(data, mapping) {
@@ -79,7 +85,8 @@ function applyMapping(data, mapping) {
         const elementModifier = element.modifier || [];
         switch (element.type) {
             case 'field_reference':
-                value = (0, lodash_1.get)(data.payload, String(element.content));
+                const sort = element.sort || null;
+                value = orderedGet(data.payload, String(element.content), sort);
                 break;
             default:
                 value = String(element.content);
@@ -92,7 +99,8 @@ function applyMapping(data, mapping) {
     return applyModifier(mapped, modifier);
 }
 function matchesExpression(data, expression) {
-    let inputValue = (0, lodash_1.get)(data.payload, expression.field);
+    const sort = expression.sort;
+    let inputValue = orderedGet(data.payload, expression.field, sort);
     let expressionValue = expression.value;
     if (isValidDateString(inputValue) && isValidDateString(expressionValue)) {
         inputValue = new Date(inputValue);
@@ -119,6 +127,41 @@ function matchesExpression(data, expression) {
             return new RegExp(expressionValue).test(inputValue);
     }
     return false;
+}
+// this is supposed to check for a field in the format of "employmentStatus.NUMBER.startDate"
+// it will then sort the array of employmentStatus objects by the startDate field
+function orderedGet(data, path, sort) {
+    if (sort === undefined || !sort) {
+        return (0, lodash_1.get)(data, path);
+    }
+    const sortDirection = sort === 'ascending' ? 1 : -1;
+    const parts = path.split('.');
+    if (parts.length === 1) {
+        return (0, lodash_1.get)(data, path);
+    }
+    const actualKey = String(parts.pop());
+    const containerIndex = String(parts.pop());
+    if (!containerIndex.match(/\d+/)) {
+        return (0, lodash_1.get)(data, path);
+    }
+    let container = (0, lodash_1.get)(data, parts);
+    if ((0, lodash_1.isArray)(container)) {
+        container.sort((a, b) => {
+            let first = autoParseValue(a[actualKey]);
+            let last = autoParseValue(b[actualKey]);
+            if (first === null || last === null) {
+                return 0;
+            }
+            if (first > last) {
+                return 1 * sortDirection;
+            }
+            if (first < last) {
+                return -1 * sortDirection;
+            }
+            return 0;
+        });
+    }
+    return (0, lodash_1.get)(container, [containerIndex, actualKey]);
 }
 function isValidDateString(dateString) {
     try {

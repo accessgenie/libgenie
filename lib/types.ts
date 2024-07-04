@@ -2,7 +2,6 @@ export type Mapping = {
   id: number;
   name: string;
   field: string;
-  dataType: string;
   block?: Block[];
   modifier?: Modifier[];
 };
@@ -12,6 +11,7 @@ export type Block = {
   type: string;
   content?: string;
   modifier?: Modifier[];
+  sort: string | null;
 };
 
 export type Expression = {
@@ -20,7 +20,7 @@ export type Expression = {
   comparison: string;
   value: string;
   name: string;
-  dataType: string;
+  sort: string | null;
 };
 
 export type Modifier = {
