@@ -26,3 +26,11 @@ export type Modifier = {
     arguments?: any;
 };
 export type ScalarType = (null | boolean | number | string | (string | number)[]);
+export declare enum PccResourceType {
+    Facilities = "facilities",
+    Roles = "roles"
+}
+export type LookupRow = {
+    key: string;
+    value: string;
+};
