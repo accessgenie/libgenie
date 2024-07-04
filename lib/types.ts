@@ -31,7 +31,7 @@ export type Modifier = {
 
 export type ScalarType = (null | boolean | number | string | (string | number)[]);
 
-export enum ResourceType {
+export enum PccResourceType {
   Facilities = 'facilities',
   Roles = 'roles',
 }
