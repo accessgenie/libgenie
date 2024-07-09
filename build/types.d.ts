@@ -5,10 +5,21 @@ export type Mapping = {
     block?: Block[];
     modifier?: Modifier[];
 };
+export type LookupTableRow = {
+    id: number;
+    source: string;
+    target: string;
+};
+export type LookupTable = {
+    id: number;
+    name: string;
+    row?: LookupTableRow[];
+};
 export type Block = {
     id: number;
     type: string;
-    content?: string;
+    content?: string | null;
+    lookupTable?: LookupTable | null;
     modifier?: Modifier[];
     sort: string | null;
 };

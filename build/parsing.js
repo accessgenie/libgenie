@@ -52,6 +52,9 @@ function _parseList(val) {
     let value = String(val);
     if (value.includes('|')) {
         const parts = value.split('|');
+        if (parts[0] === '') {
+            parts.shift();
+        }
         const parsed = [];
         for (const part of parts) {
             const numVal = _parseNumber(part);

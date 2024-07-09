@@ -57,7 +57,10 @@ export function _parseList(val: string): (string | number)[] | undefined {
   // or we could use a bool property passed here alongside value - isList
   let value = String(val);
   if (value.includes('|')) {
-    const parts = value.split('|')
+    const parts = value.split('|');
+    if (parts[0] === '') {
+      parts.shift();
+    }
     const parsed = [];
 
     for (const part of parts) {

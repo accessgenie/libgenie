@@ -92,10 +92,21 @@ export function applyMapping(data: any, mapping: Mapping): any {
   for (const element of blocks) {
     let value = '';
     const elementModifier = element.modifier || [];
+    let sort = element.sort || null;
     switch (element.type) {
       case 'field_reference':
-        const sort = element.sort || null;
         value = orderedGet(data.payload, String(element.content), sort);
+        break;
+      case 'lookup_table':
+        value = orderedGet(data.payload, String(element.content), sort);
+        const lookupTable = element.lookupTable || null;
+        if (lookupTable) {
+          const rows = lookupTable.row || [];
+          const lookup = rows.find((row) => row.source === value);
+          if (lookup) {
+            value = lookup.target;
+          }
+        }
         break;
       default:
         value = String(element.content);
