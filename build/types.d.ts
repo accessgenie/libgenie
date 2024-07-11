@@ -39,7 +39,10 @@ export type Modifier = {
 export type ScalarType = (null | boolean | number | string | (string | number)[]);
 export declare enum PccResourceType {
     Facilities = "facilities",
-    Roles = "roles"
+    Roles = "roles",
+    StandardRoles = "standardrole",
+    Departments = "departments",
+    Positions = "positions"
 }
 export type LookupRow = {
     key: string;
