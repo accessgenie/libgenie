@@ -88,6 +88,25 @@ function applyMapping(data, mapping) {
             case 'field_reference':
                 value = orderedGet(data.payload, String(element.content), sort);
                 break;
+            case 'multi_lookup_table':
+                value = orderedGet(data.payload, String(element.content), sort);
+                const multiLookupTable = element.multiLookupTable || null;
+                if (multiLookupTable) {
+                    const rows = multiLookupTable.rows || [];
+                    const lookup = rows.find((row) => row.source === value);
+                    const targets = (0, lodash_1.get)(lookup, 'targets', []);
+                    if (targets) {
+                        const correctTarget = targets.find((target) => {
+                            const targetPieces = target.target.split(' = ');
+                            const targetField = targetPieces[0];
+                            return targetField === element.multiLookupTableColumn;
+                        });
+                        if (correctTarget) {
+                            value = correctTarget.value;
+                        }
+                    }
+                }
+                break;
             case 'lookup_table':
                 value = orderedGet(data.payload, String(element.content), sort);
                 const lookupTable = element.lookupTable || null;

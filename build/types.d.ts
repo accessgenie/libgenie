@@ -15,11 +15,30 @@ export type LookupTable = {
     name: string;
     row?: LookupTableRow[];
 };
+export type MultiLookupTableTarget = {
+    id: number;
+    target: string;
+    value: string;
+};
+export type MultiLookupTableRow = {
+    id: number;
+    source: string;
+    column: string;
+    targets: MultiLookupTableTarget[];
+};
+export type MultiLookupTable = {
+    id: number;
+    isBlueprint: boolean;
+    name: string;
+    rows: MultiLookupTableRow[];
+};
 export type Block = {
     id: number;
     type: string;
     content?: string | null;
     lookupTable?: LookupTable | null;
+    multiLookupTable?: MultiLookupTable | null;
+    multiLookupTableColumn?: string | null;
     modifier?: Modifier[];
     sort: string | null;
 };
