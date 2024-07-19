@@ -3,7 +3,7 @@
     "baseUrl": ".",
     "declaration": true,
     "esModuleInterop": true,
-    "lib": [ "esnext" ],
+    "lib": [ "esnext", "dom" ],
     "module": "commonjs",
     "outDir": "build",
     "resolveJsonModule": true,
