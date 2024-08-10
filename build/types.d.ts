@@ -67,3 +67,11 @@ export type LookupRow = {
     key: string;
     value: string;
 };
+export type EmailTemplate = {
+    name: string;
+    subject: Mapping;
+    to: Mapping;
+    ccs: Mapping[];
+    template: string;
+    usedMappings: Mapping[];
+};
