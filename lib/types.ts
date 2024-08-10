@@ -86,3 +86,15 @@ export type LookupRow = {
   key: string;
   value: string;
 };
+
+export type EmailTemplate = {
+  name: string;
+  subject: Mapping;
+  to: Mapping;
+  ccs: Mapping[];
+  template: string;
+  // the usedMappings list this is just for the debugging purposes
+  // in case something goes wrong on the frontend with variables parsing, on the backend
+  // we'll still be able to see exactly what variables were chosen
+  usedMappings: Mapping[];
+}
