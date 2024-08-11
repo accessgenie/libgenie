@@ -68,6 +68,7 @@ export type LookupRow = {
     value: string;
 };
 export type EmailTemplate = {
+    id?: number;
     name: string;
     subject: Mapping;
     to: Mapping;
