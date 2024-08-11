@@ -70,7 +70,7 @@ export type LookupRow = {
 export type EmailTemplate = {
     id?: number;
     name: string;
-    subject: Mapping;
+    subject: (string | Mapping)[];
     to: Mapping;
     ccs: Mapping[];
     template: string;
