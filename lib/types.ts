@@ -92,6 +92,7 @@ export type EmailTemplate = {
   name: string;
   subject: (string | Mapping)[];
   to: Mapping;
+  from: Mapping;
   ccs: Mapping[];
   template: string;
   // the usedMappings list this is just for the debugging purposes
