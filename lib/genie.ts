@@ -1,4 +1,4 @@
-import { deburr, get, isArray, set, sortBy } from 'lodash';
+import { cloneDeep, deburr, get, isArray, set, sortBy } from 'lodash';
 import generator from 'generate-password';
 import { _parseBool, _parseList, _parseNumber } from './parsing';
 import type { Expression, Mapping, Modifier, ScalarType } from './types';
@@ -18,9 +18,10 @@ export function applyProfile(data: any, mappings: Mapping[]): any {
     payload = set(payload, field, parsed);
   }
 
-  data.payload = payload;
-
-  return data;
+  return {
+    ...data,
+    payload,
+  }
 }
 
 export function applyModifier(data: any, modifier: Modifier[]): any {

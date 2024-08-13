@@ -24,8 +24,10 @@ function applyProfile(data, mappings) {
         const field = mapping.field;
         payload = (0, lodash_1.set)(payload, field, parsed);
     }
-    data.payload = payload;
-    return data;
+    return {
+        ...data,
+        payload,
+    };
 }
 function applyModifier(data, modifier) {
     if (!modifier.length) {
