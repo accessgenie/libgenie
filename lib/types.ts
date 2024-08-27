@@ -82,6 +82,14 @@ export enum PccResourceType {
   Positions = 'positions',
 }
 
+export enum ReliasResourceType {
+  Hierarchy = 'hierarchy',
+  Departments = 'departments',
+  JobTitles = 'jobTitles',
+  Professions = 'professions',
+  Roles = 'roles',
+}
+
 export type LookupRow = {
   key: string;
   value: string;
