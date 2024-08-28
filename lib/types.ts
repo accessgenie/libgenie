@@ -92,10 +92,9 @@ export enum ReliasResourceType {
 
 export type ReliasHierarchyNode = {
   id: number;
-  parentId: number;
-  rootId: number;
+  parent: number;
   name: string;
-  children: ReliasHierarchyNode[];
+  children: number[];
 };
 
 export type LookupRow = {
