@@ -70,6 +70,13 @@ export declare enum ReliasResourceType {
     Professions = "professions",
     Roles = "roles"
 }
+export type ReliasHierarchyNode = {
+    id: number;
+    parentId: number;
+    rootId: number;
+    name: string;
+    children: ReliasHierarchyNode[];
+};
 export type LookupRow = {
     key: string;
     value: string;
