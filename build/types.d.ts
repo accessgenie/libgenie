@@ -61,14 +61,16 @@ export declare enum PccResourceType {
     Roles = "roles",
     StandardRoles = "standardrole",
     Departments = "departments",
-    Positions = "positions"
+    Positions = "positions",
+    Users = "users"
 }
 export declare enum ReliasResourceType {
     Hierarchy = "hierarchy",
     Departments = "departments",
     JobTitles = "jobTitles",
     Professions = "professions",
-    Roles = "roles"
+    Roles = "roles",
+    Users = "users"
 }
 export type ReliasHierarchyNode = {
     id: number;

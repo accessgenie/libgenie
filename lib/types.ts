@@ -80,6 +80,7 @@ export enum PccResourceType {
   StandardRoles = 'standardrole',
   Departments = 'departments',
   Positions = 'positions',
+  Users = 'users',
 }
 
 export enum ReliasResourceType {
@@ -88,6 +89,7 @@ export enum ReliasResourceType {
   JobTitles = 'jobTitles',
   Professions = 'professions',
   Roles = 'roles',
+  Users = 'users',
 }
 
 export type ReliasHierarchyNode = {

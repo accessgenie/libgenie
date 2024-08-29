@@ -8,6 +8,7 @@ var PccResourceType;
     PccResourceType["StandardRoles"] = "standardrole";
     PccResourceType["Departments"] = "departments";
     PccResourceType["Positions"] = "positions";
+    PccResourceType["Users"] = "users";
 })(PccResourceType || (exports.PccResourceType = PccResourceType = {}));
 var ReliasResourceType;
 (function (ReliasResourceType) {
@@ -16,4 +17,5 @@ var ReliasResourceType;
     ReliasResourceType["JobTitles"] = "jobTitles";
     ReliasResourceType["Professions"] = "professions";
     ReliasResourceType["Roles"] = "roles";
+    ReliasResourceType["Users"] = "users";
 })(ReliasResourceType || (exports.ReliasResourceType = ReliasResourceType = {}));
