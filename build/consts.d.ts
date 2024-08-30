@@ -1,1 +1,1 @@
-export declare const ORDERED_PCC_FIELDS: string[];
+export declare const ALLOWED_PCC_USER_FILTERS: string[];
