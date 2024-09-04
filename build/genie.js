@@ -54,6 +54,8 @@ function applyModifier(data, modifier) {
                 break;
             case 'ascii':
                 result = (0, lodash_1.deburr)(result).replace(/[^\x00-\x7F]/g, '');
+            case 'code':
+                result = eval(item.arguments.expression)(data);
         }
     }
     return result;
