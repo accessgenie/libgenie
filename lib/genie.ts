@@ -51,6 +51,8 @@ export function applyModifier(data: any, modifier: Modifier[]): any {
         break;
       case 'ascii':
         result = deburr(result).replace(/[^\x00-\x7F]/g, '');
+      case 'code':
+        result = eval(item.arguments.expression)(data);
     }
   }
 
