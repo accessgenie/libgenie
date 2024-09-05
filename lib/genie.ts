@@ -50,9 +50,7 @@ export function applyModifier(data: any, modifier: Modifier[]): any {
         result = `5${generator.generate(item.arguments)}`;
         break;
       case 'code':
-        console.log('code modifier');
-        result = eval(item.arguments.expression)(data);
-        console.log('result');
+        result = eval(`(${item.arguments.expression})`)(data);
         break;
       case 'ascii':
         result = deburr(result).replace(/[^\x00-\x7F]/g, '');
