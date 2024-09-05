@@ -53,9 +53,7 @@ function applyModifier(data, modifier) {
                 result = `5${generate_password_1.default.generate(item.arguments)}`;
                 break;
             case 'code':
-                console.log('code modifier');
-                result = eval(item.arguments.expression)(data);
-                console.log('result');
+                result = eval(`(${item.arguments.expression})`)(data);
                 break;
             case 'ascii':
                 result = (0, lodash_1.deburr)(result).replace(/[^\x00-\x7F]/g, '');
