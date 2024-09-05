@@ -49,10 +49,13 @@ export function applyModifier(data: any, modifier: Modifier[]): any {
       case 'password':
         result = `5${generator.generate(item.arguments)}`;
         break;
+      case 'code':
+        console.log('code modifier');
+        result = eval(item.arguments.expression)(data);
+        console.log('result');
+        break;
       case 'ascii':
         result = deburr(result).replace(/[^\x00-\x7F]/g, '');
-      case 'code':
-        result = eval(item.arguments.expression)(data);
     }
   }
 
