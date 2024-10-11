@@ -147,7 +147,11 @@ function matchesExpression(data, expression) {
     }
     switch (expression.comparison) {
         case 'contains':
-            return (0, lodash_1.isArray)(expressionValue) && inputValue.includes(expressionValue);
+            if (!(0, lodash_1.isArray)(inputValue)) {
+                return false;
+            }
+            const intersectionValue = (0, lodash_1.intersection)(inputValue, expressionValue);
+            return (0, lodash_1.size)(intersectionValue) === (0, lodash_1.size)(expressionValue);
         case 'equals':
             return inputValue === expressionValue;
         case 'does_not_equal':
