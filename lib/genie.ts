@@ -156,6 +156,8 @@ export function matchesExpression(data: any, expression: Expression): boolean {
   }
 
   switch (expression.comparison) {
+    case 'contains':
+      return isArray(expressionValue) && inputValue.includes(expressionValue);
     case 'equals':
       return inputValue === expressionValue;
     case 'does_not_equal':

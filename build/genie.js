@@ -146,6 +146,8 @@ function matchesExpression(data, expression) {
         expressionValue = autoParseValue(expressionValue);
     }
     switch (expression.comparison) {
+        case 'contains':
+            return (0, lodash_1.isArray)(expressionValue) && inputValue.includes(expressionValue);
         case 'equals':
             return inputValue === expressionValue;
         case 'does_not_equal':
