@@ -156,12 +156,6 @@ export function matchesExpression(data: any, expression: Expression): boolean {
   }
 
   switch (expression.comparison) {
-    case 'contains':
-      if (!isArray(inputValue)) {
-        return false;
-      }
-      const intersectionValue = intersection(inputValue, expressionValue);
-      return size(intersectionValue) === size(expressionValue);
     case 'equals':
       return inputValue === expressionValue;
     case 'does_not_equal':
@@ -176,6 +170,12 @@ export function matchesExpression(data: any, expression: Expression): boolean {
       return inputValue <= expressionValue;
     case 'regex':
       return new RegExp(expressionValue).test(inputValue);
+    case 'intersection':
+      if (!isArray(inputValue)) {
+        return false;
+      }
+      const intersectionValue = intersection(inputValue, expressionValue);
+      return size(intersectionValue) === size(expressionValue);
   }
 
   return false;

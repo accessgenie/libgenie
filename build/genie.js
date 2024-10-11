@@ -146,12 +146,6 @@ function matchesExpression(data, expression) {
         expressionValue = autoParseValue(expressionValue);
     }
     switch (expression.comparison) {
-        case 'contains':
-            if (!(0, lodash_1.isArray)(inputValue)) {
-                return false;
-            }
-            const intersectionValue = (0, lodash_1.intersection)(inputValue, expressionValue);
-            return (0, lodash_1.size)(intersectionValue) === (0, lodash_1.size)(expressionValue);
         case 'equals':
             return inputValue === expressionValue;
         case 'does_not_equal':
@@ -166,6 +160,12 @@ function matchesExpression(data, expression) {
             return inputValue <= expressionValue;
         case 'regex':
             return new RegExp(expressionValue).test(inputValue);
+        case 'intersection':
+            if (!(0, lodash_1.isArray)(inputValue)) {
+                return false;
+            }
+            const intersectionValue = (0, lodash_1.intersection)(inputValue, expressionValue);
+            return (0, lodash_1.size)(intersectionValue) === (0, lodash_1.size)(expressionValue);
     }
     return false;
 }
