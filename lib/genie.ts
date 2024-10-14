@@ -1,4 +1,4 @@
-import { cloneDeep, deburr, get, intersection, isArray, set, size, sortBy } from 'lodash';
+import { cloneDeep, deburr, get, intersection, isArray, set, size } from 'lodash';
 import generator from 'generate-password';
 import { _parseBool, _parseList, _parseNumber } from './parsing';
 import type { Expression, Mapping, Modifier, ScalarType } from './types';
@@ -60,7 +60,7 @@ export function applyModifier(data: any, modifier: Modifier[]): any {
   return result;
 }
 
-export function autoParseValue(value: string): ScalarType {
+export function autoParseValue(value: any): ScalarType {
   if (value && value.toLowerCase() === 'null') {
     return null;
   }
@@ -151,7 +151,9 @@ export function matchesExpression(data: any, expression: Expression): boolean {
     inputValue = new Date(inputValue);
     expressionValue = new Date(expressionValue);
   } else {
-    inputValue = autoParseValue(inputValue);
+    if (!isArray(inputValue)) {
+      inputValue = autoParseValue(inputValue);
+    }
     expressionValue = autoParseValue(expressionValue);
   }
 

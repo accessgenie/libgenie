@@ -142,7 +142,9 @@ function matchesExpression(data, expression) {
         expressionValue = new Date(expressionValue);
     }
     else {
-        inputValue = autoParseValue(inputValue);
+        if (!(0, lodash_1.isArray)(inputValue)) {
+            inputValue = autoParseValue(inputValue);
+        }
         expressionValue = autoParseValue(expressionValue);
     }
     switch (expression.comparison) {
