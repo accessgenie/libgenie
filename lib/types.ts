@@ -92,7 +92,7 @@ export enum ReliasResourceType {
   Users = 'users',
 }
 
-export type ReliasHierarchyNode = {
+export type HierarchyNode = {
   id: number;
   parent: number;
   name: string;
