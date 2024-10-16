@@ -73,10 +73,10 @@ export declare enum ReliasResourceType {
     Users = "users"
 }
 export type HierarchyNode = {
-    id: number;
-    parent: number;
+    id: number | string;
+    parent: number | string;
     name: string;
-    children: number[];
+    children: (number | string)[];
 };
 export type LookupRow = {
     key: string;
