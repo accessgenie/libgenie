@@ -104,6 +104,11 @@ export type LookupRow = {
   value: string;
 };
 
+export type ComplexLookupRow = {
+  key: string;
+  contents: { [name: string]: string };
+}
+
 export type EmailTemplate = {
   id?: number;
   name: string;
