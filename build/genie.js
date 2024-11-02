@@ -12,6 +12,7 @@ exports.orderedGet = orderedGet;
 const lodash_1 = require("lodash");
 const generate_password_1 = __importDefault(require("generate-password"));
 const parsing_1 = require("./parsing");
+const modifiers_1 = require("./modifiers");
 function applyProfile(data, mappings) {
     let payload = {};
     for (const mapping of mappings) {
@@ -57,6 +58,8 @@ function applyModifier(data, modifier) {
                 break;
             case 'ascii':
                 result = (0, lodash_1.deburr)(result).replace(/[^\x00-\x7F]/g, '');
+            case 'binaryTo':
+                result = (0, modifiers_1.mapBinaryValue)(result, item.arguments.values);
         }
     }
     return result;
