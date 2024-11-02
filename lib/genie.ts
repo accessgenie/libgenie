@@ -1,7 +1,8 @@
-import { cloneDeep, deburr, get, intersection, isArray, set, size } from 'lodash';
+import { deburr, get, intersection, isArray, set, size } from 'lodash';
 import generator from 'generate-password';
 import { _parseBool, _parseList, _parseNumber } from './parsing';
 import type { Expression, Mapping, Modifier, ScalarType } from './types';
+import { mapBinaryValue } from './modifiers';
 
 export function applyProfile(data: any, mappings: Mapping[]): any {
   let payload = {};
@@ -54,6 +55,8 @@ export function applyModifier(data: any, modifier: Modifier[]): any {
         break;
       case 'ascii':
         result = deburr(result).replace(/[^\x00-\x7F]/g, '');
+      case 'binaryTo':
+        result = mapBinaryValue(result, item.arguments.values);
     }
   }
 
