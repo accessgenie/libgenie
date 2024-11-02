@@ -13,8 +13,5 @@ function mapBinaryValue(input, values) {
     return normalizedInput ? values[0] : values[1];
 }
 function capitalize(input) {
-    return input
-        .split(' ')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-        .join(' ');
+    return input === null || input === void 0 ? void 0 : input.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
 }

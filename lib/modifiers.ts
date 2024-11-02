@@ -11,9 +11,9 @@ export function mapBinaryValue(input: string, values: string[]): string {
   return normalizedInput ? values[0] : values[1];
 }
 
-export function capitalize(input: string): string {
+export function capitalize(input?: string): string | undefined {
   return input
-    .split(' ')
+    ?.split(' ')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(' ');
 }
