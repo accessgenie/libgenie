@@ -58,8 +58,10 @@ function applyModifier(data, modifier) {
                 break;
             case 'ascii':
                 result = (0, lodash_1.deburr)(result).replace(/[^\x00-\x7F]/g, '');
+                break;
             case 'mapBinaryValue':
                 result = (0, modifiers_1.mapBinaryValue)(result, item.arguments.values);
+                break;
         }
     }
     return result;

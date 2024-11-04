@@ -55,8 +55,10 @@ export function applyModifier(data: any, modifier: Modifier[]): any {
         break;
       case 'ascii':
         result = deburr(result).replace(/[^\x00-\x7F]/g, '');
+        break;
       case 'mapBinaryValue':
         result = mapBinaryValue(result, item.arguments.values);
+        break;
     }
   }
 
