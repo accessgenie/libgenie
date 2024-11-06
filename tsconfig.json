@@ -11,7 +11,7 @@
     "target": "es2019"
   },
   "include": [
-    "./**/*.ts"
+    "./lib/**/*.ts"
   ],
   "exclude": [
     "./build"

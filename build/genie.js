@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.applyProfile = applyProfile;
 exports.applyModifier = applyModifier;
 exports.autoParseValue = autoParseValue;
+exports.buildApplicationSpecificUserMap = buildApplicationSpecificUserMap;
 exports.applyMapping = applyMapping;
 exports.matchesExpression = matchesExpression;
 exports.orderedGet = orderedGet;
@@ -87,19 +88,42 @@ function autoParseValue(value) {
     }
     return value;
 }
+function buildApplicationSpecificUserMap(genieUser, connections) {
+    const users = (0, lodash_1.get)(genieUser, ['users'], []);
+    const result = {};
+    for (const user of users) {
+        const userConnectionId = (0, lodash_1.get)(user, ['connectionId']);
+        if (!userConnectionId) {
+            continue;
+        }
+        const connection = connections.find((c) => c.id === userConnectionId);
+        const revisionPayload = (0, lodash_1.get)(user, ['userRevision', 'payload']);
+        result[connection.application] = revisionPayload;
+    }
+    return result;
+}
 function applyMapping(data, mapping) {
     const result = [];
     const blocks = mapping.block || [];
     for (const element of blocks) {
+        const blockApplication = (0, lodash_1.get)(element, 'application', '');
+        const basePayload = (0, lodash_1.get)(data, 'payload');
+        let payload = basePayload;
+        if (blockApplication) {
+            const applicationSpecificPayload = (0, lodash_1.get)(data, ['users', blockApplication, 'payload']);
+            if (applicationSpecificPayload) {
+                payload = applicationSpecificPayload;
+            }
+        }
         let value = '';
         const elementModifier = element.modifier || [];
         let sort = element.sort || null;
         switch (element.type) {
             case 'field_reference':
-                value = orderedGet(data.payload, String(element.content), sort);
+                value = orderedGet(payload, String(element.content), sort);
                 break;
             case 'multi_lookup_table':
-                value = orderedGet(data.payload, String(element.content), sort);
+                value = orderedGet(payload, String(element.content), sort);
                 const multiLookupTable = element.multiLookupTable || null;
                 if (multiLookupTable) {
                     const rows = multiLookupTable.rows || [];
@@ -118,7 +142,7 @@ function applyMapping(data, mapping) {
                 }
                 break;
             case 'lookup_table':
-                value = orderedGet(data.payload, String(element.content), sort);
+                value = orderedGet(payload, String(element.content), sort);
                 const lookupTable = element.lookupTable || null;
                 if (lookupTable) {
                     const rows = lookupTable.row || [];

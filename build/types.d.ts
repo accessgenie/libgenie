@@ -41,6 +41,7 @@ export type Block = {
     multiLookupTableColumn?: string | null;
     modifier?: Modifier[];
     sort: string | null;
+    application?: string | null;
 };
 export type Expression = {
     id: number;

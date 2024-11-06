@@ -95,19 +95,45 @@ export function autoParseValue(value: any): ScalarType {
   return value;
 }
 
+export function buildApplicationSpecificUserMap(genieUser: any, connections: any[]): any {
+  const users = get(genieUser, ['users'], []);
+  const result: any = {};
+  for (const user of users) {
+    const userConnectionId = get(user, ['connectionId']);
+    if (!userConnectionId) {
+      continue;
+    }
+    const connection = connections.find((c) => c.id === userConnectionId);
+    const revisionPayload = get(user, ['userRevision', 'payload']);
+    result[connection.application] = revisionPayload;
+  }
+  return result;
+}
+
 export function applyMapping(data: any, mapping: Mapping): any {
   const result = [];
   const blocks = mapping.block || [];
   for (const element of blocks) {
+    const blockApplication = get(element, 'application', '');
+    const basePayload = get(data, 'payload');
+    let payload = basePayload;
+    if (blockApplication) {
+      const applicationSpecificPayload = get(data, ['users', blockApplication, 'payload']);
+      if (applicationSpecificPayload) {
+        payload = applicationSpecificPayload;
+      }
+    }
+
     let value = '';
     const elementModifier = element.modifier || [];
     let sort = element.sort || null;
     switch (element.type) {
       case 'field_reference':
-        value = orderedGet(data.payload, String(element.content), sort);
+
+        value = orderedGet(payload, String(element.content), sort);
         break;
       case 'multi_lookup_table':
-        value = orderedGet(data.payload, String(element.content), sort);
+        value = orderedGet(payload, String(element.content), sort);
         const multiLookupTable = element.multiLookupTable || null;
         if (multiLookupTable) {
           const rows = multiLookupTable.rows || [];
@@ -126,7 +152,7 @@ export function applyMapping(data: any, mapping: Mapping): any {
         }
         break;
       case 'lookup_table':
-        value = orderedGet(data.payload, String(element.content), sort);
+        value = orderedGet(payload, String(element.content), sort);
         const lookupTable = element.lookupTable || null;
         if (lookupTable) {
           const rows = lookupTable.row || [];
