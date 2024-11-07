@@ -118,7 +118,7 @@ export function applyMapping(data: any, mapping: Mapping): any {
     const basePayload = get(data, 'payload');
     let payload = basePayload;
     if (blockApplication) {
-      const applicationSpecificPayload = get(data, ['users', blockApplication, 'payload']);
+      const applicationSpecificPayload = get(data, ['users', blockApplication]);
       if (applicationSpecificPayload) {
         payload = applicationSpecificPayload;
       }

@@ -110,7 +110,7 @@ function applyMapping(data, mapping) {
         const basePayload = (0, lodash_1.get)(data, 'payload');
         let payload = basePayload;
         if (blockApplication) {
-            const applicationSpecificPayload = (0, lodash_1.get)(data, ['users', blockApplication, 'payload']);
+            const applicationSpecificPayload = (0, lodash_1.get)(data, ['users', blockApplication]);
             if (applicationSpecificPayload) {
                 payload = applicationSpecificPayload;
             }
