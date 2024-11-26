@@ -20,9 +20,12 @@ function applyProfile(data, mappings) {
         const mapped = applyMapping(data, mapping);
         const modifier = mapping.modifier || [];
         const modified = applyModifier(mapped, modifier);
-        const hasBlockModifierPassword = mapping.block && mapping.block.findIndex(b => b.modifier && b.modifier.findIndex(m => m.name === 'password') > -1) > -1;
-        const hasMappingModifierPassword = modifier.findIndex(m => m.name === 'password') > -1;
-        const parsed = hasBlockModifierPassword || hasMappingModifierPassword ? modified : autoParseValue(modified);
+        const hasBlockModifierPassword = mapping.block &&
+            mapping.block.findIndex((b) => b.modifier && b.modifier.findIndex((m) => m.name === 'password') > -1) > -1;
+        const hasMappingModifierPassword = modifier.findIndex((m) => m.name === 'password') > -1;
+        const parsed = hasBlockModifierPassword || hasMappingModifierPassword
+            ? modified
+            : autoParseValue(modified);
         const field = mapping.field;
         payload = (0, lodash_1.set)(payload, field, parsed);
     }
@@ -115,52 +118,64 @@ function applyMapping(data, mapping) {
                 payload = applicationSpecificPayload;
             }
         }
-        let value = '';
+        let value = processElement(element, payload);
         const elementModifier = element.modifier || [];
-        let sort = element.sort || null;
-        switch (element.type) {
-            case 'field_reference':
-                value = orderedGet(payload, String(element.content), sort);
-                break;
-            case 'multi_lookup_table':
-                value = orderedGet(payload, String(element.content), sort);
-                const multiLookupTable = element.multiLookupTable || null;
-                if (multiLookupTable) {
-                    const rows = multiLookupTable.rows || [];
-                    const lookup = rows.find((row) => row.source === value);
-                    const targets = (0, lodash_1.get)(lookup, 'targets', []);
-                    if (targets) {
-                        const correctTarget = targets.find((target) => {
-                            const targetPieces = target.target.split(' = ');
-                            const targetField = targetPieces[0];
-                            return targetField === element.multiLookupTableColumn;
-                        });
-                        if (correctTarget) {
-                            value = correctTarget.value;
-                        }
-                    }
-                }
-                break;
-            case 'lookup_table':
-                value = orderedGet(payload, String(element.content), sort);
-                const lookupTable = element.lookupTable || null;
-                if (lookupTable) {
-                    const rows = lookupTable.row || [];
-                    const lookup = rows.find((row) => row.source === value);
-                    if (lookup) {
-                        value = lookup.target;
-                    }
-                }
-                break;
-            default:
-                value = String(element.content);
-        }
         value = applyModifier(value, elementModifier);
         result.push(value);
     }
     const mapped = result.join('');
     const modifier = mapping.modifier || [];
     return applyModifier(mapped, modifier);
+}
+function processElement(element, payload) {
+    let value = '';
+    let sort = element.sort || null;
+    switch (element.type) {
+        case 'field_reference':
+            value = orderedGet(payload, String(element.content), sort);
+            break;
+        case 'multi_lookup_table':
+            value = orderedGet(payload, String(element.content), sort);
+            const multiLookupTable = element.multiLookupTable || null;
+            if (multiLookupTable) {
+                const rows = multiLookupTable.rows || [];
+                const lookup = rows.find((row) => row.source === value);
+                const targets = (0, lodash_1.get)(lookup, 'targets', []);
+                if (targets) {
+                    const correctTarget = targets.find((target) => {
+                        const targetPieces = target.target.split(' = ');
+                        const targetField = targetPieces[0];
+                        return targetField === element.multiLookupTableColumn;
+                    });
+                    if (correctTarget) {
+                        value = correctTarget.value;
+                    }
+                }
+            }
+            break;
+        case 'lookup_table':
+            value = orderedGet(payload, String(element.content), sort);
+            const lookupTable = element.lookupTable || null;
+            if (lookupTable) {
+                const rows = lookupTable.row || [];
+                const lookup = rows.find((row) => row.source === value);
+                if (lookup) {
+                    value = lookup.target;
+                }
+            }
+            break;
+        case 'array':
+            const arrayContent = (0, lodash_1.get)(payload, String(element.content), []);
+            if ((0, lodash_1.isArray)(arrayContent)) {
+                value = arrayContent
+                    .map((item) => processElement({ ...element, type: element.secondaryType }, { [element.content]: item }))
+                    .join(',');
+            }
+            break;
+        default:
+            value = String(element.content);
+    }
+    return value;
 }
 function matchesExpression(data, expression) {
     const sort = expression.sort;
