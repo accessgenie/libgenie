@@ -11,9 +11,18 @@ export function applyProfile(data: any, mappings: Mapping[]): any {
     const mapped = applyMapping(data, mapping);
     const modifier = mapping.modifier || [];
     const modified = applyModifier(mapped, modifier);
-    const hasBlockModifierPassword = mapping.block && mapping.block.findIndex(b => b.modifier && b.modifier.findIndex(m => m.name === 'password') > -1) > -1;
-    const hasMappingModifierPassword = modifier.findIndex(m => m.name === 'password') > -1;
-    const parsed = hasBlockModifierPassword || hasMappingModifierPassword ? modified : autoParseValue(modified);
+    const hasBlockModifierPassword =
+      mapping.block &&
+      mapping.block.findIndex(
+        (b) =>
+          b.modifier && b.modifier.findIndex((m) => m.name === 'password') > -1,
+      ) > -1;
+    const hasMappingModifierPassword =
+      modifier.findIndex((m) => m.name === 'password') > -1;
+    const parsed =
+      hasBlockModifierPassword || hasMappingModifierPassword
+        ? modified
+        : autoParseValue(modified);
     const field = mapping.field;
 
     payload = set(payload, field, parsed);
@@ -22,7 +31,7 @@ export function applyProfile(data: any, mappings: Mapping[]): any {
   return {
     ...data,
     payload,
-  }
+  };
 }
 
 export function applyModifier(data: any, modifier: Modifier[]): any {
@@ -95,7 +104,10 @@ export function autoParseValue(value: any): ScalarType {
   return value;
 }
 
-export function buildApplicationSpecificUserMap(genieUser: any, connections: any[]): any {
+export function buildApplicationSpecificUserMap(
+  genieUser: any,
+  connections: any[],
+): any {
   const users = get(genieUser, ['users'], []);
   const result: any = {};
   for (const user of users) {
@@ -124,53 +136,70 @@ export function applyMapping(data: any, mapping: Mapping): any {
       }
     }
 
-    let value = '';
+    let value = processElement(element, payload);
     const elementModifier = element.modifier || [];
-    let sort = element.sort || null;
-    switch (element.type) {
-      case 'field_reference':
-
-        value = orderedGet(payload, String(element.content), sort);
-        break;
-      case 'multi_lookup_table':
-        value = orderedGet(payload, String(element.content), sort);
-        const multiLookupTable = element.multiLookupTable || null;
-        if (multiLookupTable) {
-          const rows = multiLookupTable.rows || [];
-          const lookup = rows.find((row) => row.source === value);
-          const targets = get(lookup, 'targets', []);
-          if (targets) {
-            const correctTarget = targets.find((target) => {
-              const targetPieces = target.target.split(' = ');
-              const targetField = targetPieces[0];
-              return targetField === element.multiLookupTableColumn;
-            });
-            if (correctTarget) {
-              value = correctTarget.value;
-            }
-          }
-        }
-        break;
-      case 'lookup_table':
-        value = orderedGet(payload, String(element.content), sort);
-        const lookupTable = element.lookupTable || null;
-        if (lookupTable) {
-          const rows = lookupTable.row || [];
-          const lookup = rows.find((row) => row.source === value);
-          if (lookup) {
-            value = lookup.target;
-          }
-        }
-        break;
-      default:
-        value = String(element.content);
-    }
     value = applyModifier(value, elementModifier);
     result.push(value);
   }
   const mapped = result.join('');
   const modifier = mapping.modifier || [];
   return applyModifier(mapped, modifier);
+}
+
+function processElement(element: any, payload: any): any {
+  let value = '';
+  let sort = element.sort || null;
+  switch (element.type) {
+    case 'field_reference':
+      value = orderedGet(payload, String(element.content), sort);
+      break;
+    case 'multi_lookup_table':
+      value = orderedGet(payload, String(element.content), sort);
+      const multiLookupTable = element.multiLookupTable || null;
+      if (multiLookupTable) {
+        const rows = multiLookupTable.rows || [];
+        const lookup = rows.find((row: any) => row.source === value);
+        const targets = get(lookup, 'targets', []);
+        if (targets) {
+          const correctTarget = targets.find((target: any) => {
+            const targetPieces = target.target.split(' = ');
+            const targetField = targetPieces[0];
+            return targetField === element.multiLookupTableColumn;
+          });
+          if (correctTarget) {
+            value = correctTarget.value;
+          }
+        }
+      }
+      break;
+    case 'lookup_table':
+      value = orderedGet(payload, String(element.content), sort);
+      const lookupTable = element.lookupTable || null;
+      if (lookupTable) {
+        const rows = lookupTable.row || [];
+        const lookup = rows.find((row: any) => row.source === value);
+        if (lookup) {
+          value = lookup.target;
+        }
+      }
+      break;
+    case 'array':
+      const arrayContent = get(payload, String(element.content), []);
+      if (isArray(arrayContent)) {
+        value = arrayContent
+          .map((item) =>
+            processElement(
+              { ...element, type: element.secondaryType },
+              { [element.content]: item },
+            ),
+          )
+          .join(',');
+      }
+      break;
+    default:
+      value = String(element.content);
+  }
+  return value;
 }
 
 export function matchesExpression(data: any, expression: Expression): boolean {
@@ -251,7 +280,6 @@ export function orderedGet(data: any, path: string, sort: string | null): any {
   }
 
   return get(container, [containerIndex, actualKey]);
-
 }
 
 function isValidDateString(dateString: string): boolean {
@@ -259,8 +287,7 @@ function isValidDateString(dateString: string): boolean {
     const date = new Date(dateString);
 
     return !isNaN(date.getTime());
-  }
-  catch {
+  } catch {
     return false;
   }
 }
