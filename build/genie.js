@@ -71,7 +71,7 @@ function applyModifier(data, modifier) {
     return result;
 }
 function autoParseValue(value) {
-    if (value && value.toLowerCase() === 'null') {
+    if (value && String(value).toLowerCase() === 'null') {
         return null;
     }
     const boolVal = (0, parsing_1._parseBool)(value);
@@ -193,6 +193,13 @@ function matchesExpression(data, expression) {
     }
     switch (expression.comparison) {
         case 'equals':
+            if ((0, lodash_1.isArray)(inputValue) && (0, lodash_1.isArray)(expressionValue)) {
+                const stringInput = (0, lodash_1.map)(inputValue, (value) => String(value));
+                const stringExpression = (0, lodash_1.map)(expressionValue, (value) => String(value));
+                const sortedInput = stringInput.sort();
+                const sortedExpression = stringExpression.sort();
+                return (0, lodash_1.isEqual)(sortedInput, sortedExpression);
+            }
             return inputValue === expressionValue;
         case 'does_not_equal':
             return inputValue !== expressionValue;
