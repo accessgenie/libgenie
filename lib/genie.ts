@@ -1,4 +1,4 @@
-import { deburr, get, intersection, isArray, set, size } from 'lodash';
+import { deburr, get, intersection, isArray, isEqual, isEqualWith, map, set, size } from 'lodash';
 import generator from 'generate-password';
 import { _parseBool, _parseList, _parseNumber } from './parsing';
 import type { Expression, Mapping, Modifier, ScalarType } from './types';
@@ -219,6 +219,13 @@ export function matchesExpression(data: any, expression: Expression): boolean {
 
   switch (expression.comparison) {
     case 'equals':
+      if (isArray(inputValue) && isArray(expressionValue)) {
+        const stringInput = map(inputValue, (value) => String(value));
+        const stringExpression = map(expressionValue, (value) => String(value));
+        const sortedInput = stringInput.sort();
+        const sortedExpression = stringExpression.sort();
+        return isEqual(sortedInput, sortedExpression);
+      }
       return inputValue === expressionValue;
     case 'does_not_equal':
       return inputValue !== expressionValue;
